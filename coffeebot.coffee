@@ -5,8 +5,9 @@ jerk = require './vendor/Jerk/lib/jerk'
 options = {
   server: 'irc.freenode.net',
   nick: 'coffeebot__',
-  channels: ['#%mule', '#coffeescript'],
-  csLocation: '../coffee-script'
+  channels: ['#%mule'],
+  csLocation: '../coffee-script',
+  coffeeBin: '/usr/local/bin/coffee'
 }
 
 spawn = require('child_process').spawn
@@ -18,27 +19,23 @@ jerk((j) ->
   j.watch_for /^cs>(.*)$/, (message) ->
     try
       timer = null
-      js = CoffeeScript.compile message.match_data[1], noWrap: true
-      
       stdout = ''
       stderr = ''
       output = (data) ->
         stdout += if !!data then data else ''
       errOut = (data) ->
         stderr += if !!data then data else ''
-      child = spawn 'node', ['runner.js']
+      child = spawn options.coffeeBin, ['runner.coffee']
       child.stdout.addListener 'data', output
       child.stderr.addListener 'data', errOut
       child.addListener 'exit', (exitCode) ->
         clearTimeout(timer)
-        
         if stdout == ''
-          console.log 'empty!'
           stdout = stderr
-
-        message.say if stdout? then stdout else 'error. hm.'
+        message.say if stdout? then "#{message.user}: #{stdout}" else 'error. hm.'
       
-      child.stdin.write js
+      code = message.match_data[1]
+      child.stdin.write code
       child.stdin.end()
       
       timeoutCallback = ->
@@ -48,7 +45,7 @@ jerk((j) ->
         stdout = "TimeoutError"
         child.kill()
       
-      timer = setTimeout(timeoutCallback, 1000)
+      timer = setTimeout(timeoutCallback, 5000)
       
       
     catch e # error parsing the CS
