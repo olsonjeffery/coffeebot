@@ -28,6 +28,7 @@ run = ->
         result = console[console.length-10..console.length]
         result.unshift('More than 10 results, showing last ten.')
         console = result
+      console = for v in console then (if v.length > 512 then v[0..508]+'...' else v)
       process.stdout.write console.join("\n")
     else
       process.stdout.write sys.inspect(output)
