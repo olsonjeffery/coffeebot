@@ -11,10 +11,14 @@ stdin.addListener 'data', (data) ->
 
 sandbox = {}
 run = ->
-  js = CS.compile code, noWrap: true
-  output = Script.runInNewContext js, sandbox
   process.stdout.addListener 'drain', ->
     process.exit 0
-  process.stdout.write(sys.inspect(output))
+  if code == '__get_cs_version'
+    versionInfo = "coffee v#{CS.VERSION}, node.js #{process.version}"
+    process.stdout.write versionInfo
+  else
+    js = CS.compile code, noWrap: true
+    output = Script.runInNewContext js, sandbox
+    process.stdout.write(sys.inspect(output))
 
 stdin.addListener 'end', run
