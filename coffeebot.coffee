@@ -9,27 +9,54 @@ options = {
   csLocation: '../coffee-script'
 }
 
-
-Sandbox = require './lib/sandbox'
-sb = null
-reset = ->
-  sb = new Sandbox()
-reset()
+spawn = require('child_process').spawn
 
 CoffeeScript = require options.csLocation + '/lib/coffee-script'
+csVersion = CoffeeScript.VERSION
 
 jerk((j) ->
   j.watch_for /^cs>(.*)$/, (message) ->
     try
-      #
+      timer = null
       js = CoffeeScript.compile message.match_data[1], noWrap: true
       
-      sb.run js, (output) ->
-        result = output # if output isnt undefined then output else 'undefined'
-        message.say result
-    catch e
-      message.say if e.stack isnt undefined then e.stack.split("\n")[0] else e.toString()    
+      stdout = ''
+      stderr = ''
+      output = (data) ->
+        stdout += if !!data then data else ''
+      errOut = (data) ->
+        stderr += if !!data then data else ''
+      child = spawn 'node', ['runner.js']
+      child.stdout.addListener 'data', output
+      child.stderr.addListener 'data', errOut
+      child.addListener 'exit', (exitCode) ->
+        clearTimeout(timer)
+        
+        if stdout == ''
+          console.log 'empty!'
+          stdout = stderr
+
+        message.say if stdout? then stdout else 'error. hm.'
+      
+      child.stdin.write js
+      child.stdin.end()
+      
+      timeoutCallback = ->
+        child.stdout.removeListener 'output', output
+        child.stderr.removeListener 'errOut', errOut
+
+        stdout = "TimeoutError"
+        child.kill()
+      
+      timer = setTimeout(timeoutCallback, 1000)
+      
+      
+    catch e # error parsing the CS
+      message.say if e.stack? then e.split("\n")[0] else e.toString()    
 
   j.watch_for /^!quit/, (message) ->
     process.exit(0)
+  
+  j.watch_for /^!version/, (message) ->
+    message.say "I'm running CoffeeScript v"+csVersion
 ).connect options
