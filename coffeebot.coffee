@@ -1,19 +1,6 @@
 jerk = require './vendor/Jerk/lib/jerk'
-
-# lame config, weee
-
-options = {
-  server: 'irc.freenode.net',
-  nick: 'coffeebot__',
-  channels: ['#%mule'],
-  csLocation: '../coffee-script',
-  coffeeBin: '/usr/local/bin/coffee'
-}
-
+options = require('./options')
 spawn = require('child_process').spawn
-
-CoffeeScript = require options.csLocation + '/lib/coffee-script'
-csVersion = CoffeeScript.VERSION
 
 jerk((j) ->
   j.watch_for /^cs>(.*)$/, (message) ->
@@ -55,5 +42,5 @@ jerk((j) ->
     process.exit(0)
   
   j.watch_for /^!version/, (message) ->
-    message.say "I'm running CoffeeScript v"+csVersion
+    message.say "I'm running CoffeeScript v0"
 ).connect options
