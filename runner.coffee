@@ -9,8 +9,12 @@ code = ''
 stdin.addListener 'data', (data) ->
   code += data
 
-sandbox = {}
 run = ->
+  console = []
+  usedPuts = false
+  sandbox = {}
+  sandbox.puts = (d) -> console.push d; usedPuts = true
+  
   process.stdout.addListener 'drain', ->
     process.exit 0
   if code == '__get_cs_version'
@@ -19,6 +23,13 @@ run = ->
   else
     js = CS.compile code, noWrap: true
     output = Script.runInNewContext js, sandbox
-    process.stdout.write(sys.inspect(output))
+    if usedPuts
+      if console.length > 10
+        result = console[console.length-10..console.length]
+        result.unshift('More than 10 results, showing last ten.')
+        console = result
+      process.stdout.write console.join("\n")
+    else
+      process.stdout.write sys.inspect(output)
 
 stdin.addListener 'end', run
