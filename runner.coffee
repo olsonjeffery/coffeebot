@@ -6,30 +6,31 @@ CS = require "#{options.csLocation}/lib/coffee-script"
 stdin = process.openStdin()
 code = ''
 
-stdin.addListener 'data', (data) ->
-  code += data
+stdin.addListener 'data', (data) -> code += data
 
 run = ->
-  console = []
-  usedPuts = false
-  sandbox = {}
-  sandbox.puts = (d) -> console.push d; usedPuts = true
-  
   process.stdout.addListener 'drain', ->
     process.exit 0
   if code == '__get_cs_version'
     versionInfo = "coffee v#{CS.VERSION}, node.js #{process.version}"
     process.stdout.write versionInfo
   else
+    outputLog = []
+    usedPuts = false
+    sandbox = {}
+    sandbox.puts = (d) -> outputLog.push d; usedPuts = true
+    
     js = CS.compile code, noWrap: true
     output = Script.runInNewContext js, sandbox
     if usedPuts
-      if console.length > 10
-        result = console[console.length-10..console.length]
+      if outputLog.length > 10
+        result = outputLog[outputLog.length-10..outputLog.length]
         result.unshift('More than 10 results, showing last ten.')
-        console = result
-      console = for v in console then (if v.length > 512 then v[0..508]+'...' else v)
-      process.stdout.write console.join("\n")
+        outputLog = result
+      if outputLog.join('\n').length > 512
+        outputLog.unshift('Total output length greater than 512 characters. Truncating.')
+        outputLog = (outputLog.join('\n')[0..508]+'...').split('\n')
+      process.stdout.write outputLog.join("\n")
     else
       process.stdout.write sys.inspect(output)
 
