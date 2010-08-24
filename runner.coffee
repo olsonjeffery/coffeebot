@@ -1,7 +1,7 @@
 sys = require 'sys'
 Script = process.binding('evals').Script
-
-CS = require '../coffee-script/lib/coffee-script'
+options = require './options'
+CS = require "#{options.csLocation}/lib/coffee-script"
 
 stdin = process.openStdin()
 code = ''
