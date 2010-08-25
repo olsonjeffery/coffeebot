@@ -16,8 +16,9 @@ run = ->
   if code == '__get_cs_version'
     git.sha1Hash options.csLocation, (csHash) ->
       git.sha1Hash options.nodeLocation, (nodeHash) ->
-        versionInfo = "coffee v#{CS.VERSION} (#{csHash}), node.js #{process.version} (#{nodeHash})"
-        process.stdout.write versionInfo
+        git.sha1Hash process.cwd(), (cbHash) ->
+          versionInfo = "coffeebot #{cbHash}, running coffee v#{CS.VERSION} (#{csHash}), node.js #{process.version} (#{nodeHash})"
+          process.stdout.write versionInfo
   else
     outputLog = []
     usedPuts = false
