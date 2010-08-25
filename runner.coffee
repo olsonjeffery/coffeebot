@@ -27,14 +27,10 @@ run = ->
     js = CS.compile code, noWrap: true
     output = Script.runInNewContext js, sandbox
     if usedPuts
-      if outputLog.length > 10
-        result = outputLog[outputLog.length-10..outputLog.length]
-        result.unshift('More than 10 results, showing last ten.')
-        outputLog = result
-      if outputLog.join('\n').length > 512
-        outputLog.unshift('Total output length greater than 512 characters. Truncating.')
-        outputLog = (outputLog.join('\n')[0..508]+'...').split('\n')
-      process.stdout.write outputLog.join("\n")
+      if outputLog.length > 1 or outputLog.join("\n").length > 512
+        git.postGist(outputLog.join("\n"), options.gistBin, (o) -> process.stdout.write(o))
+      else
+        process.stdout.write outputLog.join("\n")
     else
       process.stdout.write sys.inspect(output)
 

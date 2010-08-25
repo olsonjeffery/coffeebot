@@ -1,12 +1,13 @@
 Options = {
-  server: 'irc.freenode.net',		# server to connect to
-  nick: 'coffeebot__',			# bot's nickname
-  channels: ['#%mule'],			# channel(s) to join
-  nodeLocation: '/home/jeff/src/node',
+  server: 'irc.freenode.net'		# server to connect to
+  nick: 'coffeebot__'			# bot's nickname
+  channels: ['#botwar']			# channel(s) to join
+  nodeLocation: '/path/to/src/node'
 					# path to node.js repo
-  csLocation: '/home/jeff/src/coffee-script',	
+  csLocation: '/path/to/src/coffee-script'
 					# abs path to coffee-script git repo
-  coffeeBin: '/usr/local/bin/coffee'	# abs path to 'coffee' bin
+  coffeeBin: '/path/to/bin/coffee'	# abs path to 'coffee' bin
+  gistBin: '/path/to/bin/gist'		# abs path to 'gist' bin
 }
 
 module.exports = Options

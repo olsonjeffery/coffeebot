@@ -1,4 +1,5 @@
 exec = require('child_process').exec
+spawn = require('child_process').spawn
 
 sha1Hash = (path, cb) ->
   curr = process.cwd()
@@ -17,4 +18,14 @@ pullOnRepo = (path, cb) ->
     sha1Hash path, (sha1) ->
       cb sha1
 
-module.exports = {sha1Hash:sha1Hash, pullOnRepo:pullOnRepo}
+postGist = (code, gistBin, cb) ->
+  stdout = ''  
+  output = (d) -> stdout += if !!d then d else ''
+  child = spawn gistBin
+  child.stdout.addListener 'data', output
+  child.addListener 'exit', (exitCode) ->
+    cb stdout
+  child.stdin.write code
+  child.stdin.end()
+
+module.exports = {sha1Hash:sha1Hash, pullOnRepo:pullOnRepo, postGist:postGist}
