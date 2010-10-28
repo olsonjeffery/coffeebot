@@ -25,7 +25,7 @@ run = ->
     sandbox = {}
     sandbox.puts = (d) -> outputLog.push d; usedPuts = true
     
-    js = CS.compile code, noWrap: true
+    js = CS.compile code, bare: true
     output = Script.runInNewContext js, sandbox
     if usedPuts
       if outputLog.length > 1 or outputLog.join("\n").length > 512
@@ -33,6 +33,7 @@ run = ->
       else
         process.stdout.write outputLog.join("\n")
     else
-      process.stdout.write sys.inspect(output)
+      inspectOutput = sys.inspect(output)
+      process.stdout.write inspectOutput
 
 stdin.addListener 'end', run
