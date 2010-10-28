@@ -7,7 +7,7 @@ sha1Hash = (path, cb) ->
   bleh = ''
   exec 'git log -1', (er, o, e) -> 
     process.chdir curr
-    sha1 = o.split('\n')[0].replace('commit ', '')[0..7]
+    sha1 = o.split('\n')[0].replace('commit ', '').slice(0, 7)
     cb sha1
 
 pullOnRepo = (path, cb) ->
