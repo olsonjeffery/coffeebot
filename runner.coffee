@@ -28,10 +28,10 @@ run = ->
     js = CS.compile code, bare: true
     output = Script.runInNewContext js, sandbox
     if usedPuts
-      if outputLog.length > 1 or outputLog.join("\n").length > 512
-        git.postGist(outputLog.join("\n"), options.gistBin, (o) -> process.stdout.write(o))
-      else
-        process.stdout.write outputLog.join("\n")
+      #if outputLog.length > 1 or outputLog.join("\n").length > 512
+      #  git.postGist(outputLog.join("\n"), options.gistBin, (o) -> process.stdout.write(o))
+      #else
+      process.stdout.write outputLog.join("\n")
     else
       inspectOutput = sys.inspect(output)
       process.stdout.write inspectOutput
